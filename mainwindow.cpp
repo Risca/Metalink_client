@@ -30,6 +30,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    emit destroyed(this);
+    foreach (ChatWindow *chat, chats) {
+        delete chat;
+    }
+
     delete ui;
 }
 

@@ -15,6 +15,7 @@ class Manager : public QObject
 Q_OBJECT
 public:
     explicit Manager(QObject *parent = 0);
+    ~Manager();
 
 private slots:
     void sendNick();
@@ -38,7 +39,7 @@ private:
     Chat * initChat(ChatCommand &command);
 
     QTabWidget tabWidget;
-    ChatTabs tabMain;
+    ChatTabs *tabMain;
 
     void readSettings();
 };

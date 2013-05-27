@@ -7,7 +7,8 @@ Manager::Manager(QObject *parent) :
     _hostname("localhost"),
     _port(1337),
     commandMapper(new QSignalMapper(this)),
-    _settings(new QSettings("Shadowrun Comlink","MetaLink",this))
+    _settings(new QSettings("Shadowrun Comlink","MetaLink",this)),
+    tabMain(new ChatTabs)
 {
     MainWindow *main = new MainWindow();
     connect(main, SIGNAL(nickChanged(QString)), this, SLOT(setNick(QString)));
@@ -33,7 +34,17 @@ Manager::Manager(QObject *parent) :
 #endif
     tabWidget.setTabsClosable(true);
     connect(&tabWidget,SIGNAL(tabCloseRequested(int)),SLOT(destroyTab(int)));
-    tabMain.setCentralWidget(&tabWidget);
+    tabMain->setCentralWidget(&tabWidget);
+}
+
+Manager::~Manager()
+{
+    delete _connection;
+    delete commandMapper;
+    delete _settings;
+    foreach (Chat *chat, chats) {
+        delete chat;
+    }
 }
 
 void Manager::sendNick()
@@ -78,8 +89,8 @@ void Manager::parseIncomingChatCommand()
             if (chat) {
                 // Create chat tab
                 tabWidget.addTab(chat,chat->participants().join(", "));
-                connect(&tabMain,SIGNAL(closed()),chat,SLOT(close()));
-                tabMain.show();
+                connect(tabMain,SIGNAL(closed()),chat,SLOT(close()));
+                tabMain->show();
                 command.retranslateCommand(ChatCommand::Accept);
             } else {
                 command.retranslateCommand(ChatCommand::Reject);
@@ -103,7 +114,7 @@ void Manager::parseIncomingChatCommand()
         tabWidget.removeTab(tabWidget.indexOf(chat));
         // Close tabMain if there are no tabs left
         if (tabWidget.count()==0) {
-            tabMain.hide();
+            tabMain->hide();
         }
         chats.removeOne(chat);
         chat->deleteLater();
@@ -158,6 +169,11 @@ void Manager::parseOutgoingChatCommand(int chatID)
             case ChatCommand::Reject:
                 break;
             case ChatCommand::Leave:
+                // MainWindow can take care of itself
+                if (chat == chats.first()) {
+                    qDebug() << "MainWindow can take care of itself";
+                    return;
+                }
                 chats.removeOne(chat);
                 chat->deleteLater();
                 break;
@@ -183,7 +199,7 @@ void Manager::destroyTab(int index)
         chat->close();
         tabWidget.removeTab(index);
         if (tabWidget.count() < 1) {
-            tabMain.hide();
+            tabMain->hide();
         }
     }
 }
