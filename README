@@ -1,0 +1,52 @@
+Multi-user chat client. Needs server
+
+Protocol structure:
+<DataType>+' '+<Size of Message>+' '+<Message>
+
+DataType:
+MESSAGE
+PING
+PONG
+NICK
+CHAT
+LIST
+
+Structure of CHAT message:
+“CHAT"+' '<Chat ID>+' '+<ChatCommand>+' '+<Message>
+
+ChatCommand:
+INIT
+INVITE
+LIST
+ACCEPT
+REJECT
+LEAVE
+
+The DataType and ChatCommand LIST both share the same message structure (also called MetaLinkList):
+<Number of items in list>+' '+<Length of first item>+' '+<First item>+' '+<Length of second item>+' '+<Second item>+etc. etc.
+
+Structure of INIT: //Only clients initiate this command
+“INIT"+' '+<MetaLinkList of participants in new chat>
+//Note that INIT is always prepended by chat ID of 0
+
+Structure of INVITE: //Both server and client can do this
+“INVITE"+' '+<MetaLinkList of participants to invite>
+
+Structure of LIST //Server command
+“LIST"+' '+<MetaLinkList of participants in current chat>
+
+Structure of ACCEPT //Client command
+"ACCEPT"+' '+""
+//May change in the future
+
+Structure of REJECT //Client command
+"REJECT"+' '+""
+//May change in the future
+
+Structure of LEAVE //Both client and server (“kick") can do this
+“LEAVE"+' '+<Optional leave message>
+
+Structure of MESSAGE (server->client): //Chat ID 0==broadcast
+“MESSAGE"+' '+<MetaLinkList with only sender Nick>+' '+<Message>
+Structure of MESSAGE (client->server): //Chat ID 0==broadcast
+“MESSAGE"+' '+<Message>
