@@ -6,11 +6,11 @@
 QT += network
 TARGET = sandbox
 TEMPLATE = app
-INCLUDEPATH += ../Common/ChatCommand \
-    ../Common/Chat \
-    ../Common/Connection \
-    ../Common/customPlainTextEdit
-LIBS += -L../Common-libs \
+INCLUDEPATH += ../Metalink_Common/ChatCommand \
+    ../Metalink_Common/Chat \
+    ../Metalink_Common/Connection \
+    ../Metalink_Common/customPlainTextEdit
+LIBS += -L../Metalink_Common-libs \
     -lChatCommand \
     -lChat \
     -lConnection \
